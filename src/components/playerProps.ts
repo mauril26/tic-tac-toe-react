@@ -1,5 +1,7 @@
+import { PlayerToken } from "../PlayerToken";
+
 export type PlayerProps = {
   initialName: string;
-  token: 'X' | 'O';
+  token: PlayerToken;
   onSavePlayerName: (name: string) => void
 }
