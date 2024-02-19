@@ -1,8 +1,12 @@
 {
-  "name": "react-essentials-deep-dive-adv",
+  "name": "react-tic-tac-toe",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "author": {
+    "email": "mauril26@gmail.com",
+    "name": "mauricio ruiz"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -11,7 +15,8 @@
   },
   "dependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "tic-tac-toe": "0.0.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",

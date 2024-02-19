@@ -1,12 +1,13 @@
+import { isCoordinate } from 'tic-tac-toe';
+
 import { ReactNode } from "react";
 import { boardProps } from "./boardProps";
-import { isLocation } from "../BoardLocation";
 
 export default function Board(props: boardProps) {
   function onBoardClickHandle(row: number, column: number): void {
     const location = { 'x': row, 'y': column };
     
-    if( isLocation(location)) {
+    if (isCoordinate(location)) {
       props.boxClicked(location);
     } else {
       console.error('Invalid location!');
@@ -28,9 +29,8 @@ export default function Board(props: boardProps) {
   }
 
   function getBoard(): ReactNode {
-    console.log(props);
-
     const result = new Array<boolean>(props.value.length).fill(true).map((_, index) => <li key={index}>{getRow(index)}</li>)
+
     return result
   }
 

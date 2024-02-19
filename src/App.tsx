@@ -1,19 +1,14 @@
 import { useState } from "react";
+
+import { BoardBox, MoveResult, TicTacToe, Tokens, Coordinate } from 'tic-tac-toe'
+
 import Board from "./components/Board";
 import Header from "./components/Header";
 import Log from "./components/Log";
 import Player from "./components/Player";
-import { BoardLocation } from "./BoardLocation";
-import { AllowedBoxValues, PlayerToken } from "./PlayerToken";
+import GameOver from "./components/GameOver";
 
-
-const initialBoard: AllowedBoxValues[][] = [
-  [undefined, undefined, undefined],
-  [undefined, undefined, undefined],
-  [undefined, undefined, undefined]
-]
-
-type Player = {
+export type Player = {
   'name': string;
   'token': string;
 };
@@ -23,65 +18,48 @@ type PlayerList = {
   'player2': Player
 }
 
+let game = new TicTacToe();
+let isVictory = false;
+let isDrawn = false;
 
 function App() {
-  const [currentTurn, setCurrentTurn] = useState<PlayerToken>('X');
+  const [currentTurn, setCurrentTurn] = useState<Tokens>(game.getCurrentPlayer());
   const [players, setPlayer] = useState<PlayerList | undefined>(undefined);
-  const [board, setBoard] = useState<AllowedBoxValues[][]>(initialBoard);
-  
-  function validateWinnerRow(location: BoardLocation): boolean {
-    if (board[location.x].some((item) => item === undefined))
-      return false
-    
-    return board[location.x][0] === board[location.x][1] && (board[location.x][1] === board[location.x][2]);
+  const [board, setBoard] = useState<BoardBox[][]>(game.getBoard());
+
+  function isCurrentTurn(token: Tokens): boolean {
+    return currentTurn === token;
   }
 
-  function validateWinnerColumn(location: BoardLocation): boolean {
-    const someIsEmpty = board.some((row) => {
-      return row[location.y] === undefined
-    });
-
-    if (someIsEmpty)
-      return false;
-    
-    return board[0][location.y] === board[1][location.y] && (board[1][location.y] === board[2][location.y]);
+  function updateBoard() {
+    setBoard(() => [...game.getBoard().map((row) => [...row])]);
   }
 
-  function validateWinnerDiagonal(location: BoardLocation): boolean {
-    return false;
+  function hasFinished(): boolean {
+    return isDrawn || isVictory;
   }
 
-  function hasWon(location: BoardLocation): boolean {
-    return validateWinnerRow(location) || validateWinnerColumn(location) || validateWinnerDiagonal(location);
-  }
+  function onBoardClicked(location: Coordinate): void {
+    const result = game.makeMove({ x: location.x, y: location.y });
 
-  function isValidMovement(location: BoardLocation): boolean {
-    return (board[location.x][location.y] === undefined)
-  }
-  
-  function updateBoard(location: BoardLocation) {
-    setBoard((previous) => {
-      const newBoard = [...previous.map((row) => [...row])];
-
-      newBoard[location.x][location.y] = currentTurn;
-
-      return newBoard;
-    });
-  }
-
-  function onBoardClicked(location: BoardLocation): void {
-    if (hasWon(location)) {
-      console.log('Game over');
+    if (result === MoveResult.Invalid) {
+      console.log('Invalid movement:', location);
       return;
     }
 
-    if(isValidMovement(location)) {
-      updateBoard(location);
-
-      setCurrentTurn((oldTurn) => oldTurn === 'O' ? 'X' : 'O')
-    } else {
-      console.log('Invalid movement:', location);
+    updateBoard();
+    
+    if (result === MoveResult.Victory) {
+      isVictory = true;
+      return;
     }
+    
+    if (result === MoveResult.Draw) {
+      isDrawn = true;
+      return;
+    }
+
+    setCurrentTurn(game.getCurrentPlayer());
   }
 
   function setPlayerName(playerId: 'player1' | 'player2', token: string, name: string) {
@@ -99,22 +77,43 @@ function App() {
     });
   }
 
+  function onRestart(): void {
+    game = new TicTacToe();
+    isVictory = false;
+    isDrawn = false;
+
+    setCurrentTurn(game.getCurrentPlayer());
+    updateBoard();
+  }
+
   return (
     <>
       <Header />
       <div id="game-container">
-        <ol id="players">
+        <ol id="players" className="highlight-player">
           <Player
             token="X"
             initialName="Player #1"
+            currentValue={players?.player1}
             onSavePlayerName={ (name: string) => setPlayerName('player1', 'X', name) }
+            isActive={isCurrentTurn("X")}
           />
           <Player
             token="O"
             initialName="Player #2"
+            currentValue={players?.player2}
             onSavePlayerName={ (name: string) => setPlayerName('player2', 'O', name) }
+            isActive={isCurrentTurn("O")}
           />
         </ol>
+        {hasFinished()
+          &&
+          <GameOver
+            isDraw={isDrawn}
+            isVictory={isVictory}
+            winner={isCurrentTurn("O") ? 'O' : 'X'}
+            restart={() => onRestart()}
+          />}
         <Board value={board} boxClicked={(location) => onBoardClicked(location)} />
       </div>
       <Log />

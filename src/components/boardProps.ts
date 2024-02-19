@@ -1,7 +1,6 @@
-import { BoardLocation } from "../BoardLocation"
-import { AllowedBoxValues } from "../PlayerToken"
+import { BoardBox, Coordinate } from "tic-tac-toe"
 
 export type boardProps = {
-  'value': AllowedBoxValues[][]
-  'boxClicked': (location: BoardLocation) => void
+  'value': BoardBox[][]
+  'boxClicked': (location: Coordinate) => void
 }

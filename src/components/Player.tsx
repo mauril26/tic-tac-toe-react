@@ -3,7 +3,7 @@ import { PlayerProps } from "./playerProps";
 
 export default function Player(props: PlayerProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState<string | undefined>(undefined);
+  const [name, setName] = useState<string | undefined>(props.currentValue?.name);
 
   function getButtonLabel() {
     return isEditing ? "Save" : "Edit";
@@ -41,9 +41,11 @@ export default function Player(props: PlayerProps) {
 
   return (
     <>
-      <li className="player">
-        {getPlayerName()}
-        <span className="player-symbol">{props.token}</span>
+      <li className={props.isActive ? 'active' : undefined}>
+        <span className="player">
+          {getPlayerName()}
+          <span className="player-symbol">{props.token}</span>
+        </span>
       </li>
       <button onClick={onEditButtonHandle}>{getButtonLabel()}</button>
     </>

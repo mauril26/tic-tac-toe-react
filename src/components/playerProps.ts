@@ -1,7 +1,10 @@
-import { PlayerToken } from "../PlayerToken";
+import { Tokens,  } from "tic-tac-toe";
+import { Player } from "../App";
 
 export type PlayerProps = {
   initialName: string;
-  token: PlayerToken;
+  token: Tokens;
+  isActive: boolean;
+  currentValue: Player | undefined;
   onSavePlayerName: (name: string) => void
 }
